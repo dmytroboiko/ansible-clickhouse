@@ -5,7 +5,7 @@
 - name: Requirements check | Not supported distribution && release
   fail:
     msg: "Your distribution {{ ansible_distribution }}_{{ ansible_distribution_release }} not supported by this role,sorry."
-  when: clickhouse_supported|bool != True
+  when: not clickhouse_supported|bool
 
 - include: "{{ item }}"
   with_first_found:
