@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- {{ ansible_managed }} -->
 <yandex>
-   <profiles>
+   <profiles{% if clickhouse_profiles_zookeeper_key is defined %} replace="replace" from_zk="{{ clickhouse_profiles_zookeeper_key }}"{% endif %}>
     <!-- Profiles of settings. -->
     <!-- Default profiles. -->
     {% for dict_item in clickhouse_profiles_default %}
@@ -24,7 +24,7 @@
     </profiles>
 
     <!-- Users and ACL. -->
-    <users>
+    <users{% if clickhouse_users_zookeeper_key is defined %} replace="replace" from_zk="{{ clickhouse_users_zookeeper_key }}"{% endif %}>
     <!-- Default users. -->
     {% for user in clickhouse_users_default %}
     {% if user.comment is defined %}

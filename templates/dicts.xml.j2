@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!-- {{ ansible_managed }} -->
+<yandex>
+    {% for dict in clickhouse_dicts %}
+    <dictionary>
+        <name>{{ clickhouse_dicts[dict].name }}</name>
+        <source>
+        {% if clickhouse_dicts[dict].odbc_source.connection_string is defined %}
+            <odbc>
+                <connection_string>{{ clickhouse_dicts[dict].odbc_source.connection_string }}</connection_string>
+                <table>{{ clickhouse_dicts[dict].odbc_source.source_table }}</table>
+            </odbc>
+        {% elif clickhouse_dicts[dict].mysql_source.db is defined %}
+            <mysql>
+            {% if clickhouse_dicts[dict].mysql_source.host is defined %}
+                <host>{{ clickhouse_dicts[dict].mysql_source.host }}</host>
+            {% endif %}
+            {% if clickhouse_dicts[dict].mysql_source.socket is defined %}
+                <socket>{{ clickhouse_dicts[dict].mysql_source.socket }}</socket>
+            {% endif %}
+                <port>{{ clickhouse_dicts[dict].mysql_source.port|default(3306) }}</port>
+                <user>{{ clickhouse_dicts[dict].mysql_source.user|default(root) }}</user>
+                <password>{{ clickhouse_dicts[dict].mysql_source.password }}</password>
+            {% if clickhouse_dicts[dict].mysql_source.replicas is defined %}
+            {% for replica in clickhouse_dicts[dict].mysql_source.replicas %}
+                <replica>
+                    <host>{{ replica.host }}</host>
+                    <priority>{{ replica.priority|default(1) }}</priority>
+                </replica>
+            {% endfor %}
+            {% endif %}
+                <db>{{ clickhouse_dicts[dict].mysql_source.db }}</db>
+                <table>{{ clickhouse_dicts[dict].mysql_source.table }}</table>
+            {% if clickhouse_dicts[dict].mysql_source.where is defined %}
+                <where>{{ clickhouse_dicts[dict].mysql_source.where }}</where>
+            {% endif %}
+            {% if clickhouse_dicts[dict].mysql_source.invalidate_query is defined %}
+                <invalidate_query>{{ clickhouse_dicts[dict].mysql_source.invalidate_query }}</invalidate_query>
+            {% endif %}
+            </mysql>
+        {% elif clickhouse_dicts[dict].clickhouse_source.db is defined %}
+            <clickhouse>
+                {% if clickhouse_dicts[dict].clickhouse_source.host is defined %}
+                    <host>{{ clickhouse_dicts[dict].clickhouse_source.host }}</host>
+                {% endif %}
+                    <port>{{ clickhouse_dicts[dict].clickhouse_source.port|default(9000) }}</port>
+                    <user>{{ clickhouse_dicts[dict].clickhouse_source.user|default(default) }}</user>
+                    <password>{{ clickhouse_dicts[dict].clickhouse_source.password }}</password>
+                    <db>{{ clickhouse_dicts[dict].clickhouse_source.db|default(default) }}</db>
+                    <table>{{ clickhouse_dicts[dict].clickhouse_source.table }}</table>
+                {% if clickhouse_dicts[dict].clickhouse_source.where is defined %}
+                    <where>{{ clickhouse_dicts[dict].clickhouse_source.where }}</where>
+                {% endif %}
+                {% if clickhouse_dicts[dict].clickhouse_source.invalidate_query is defined %}
+                    <invalidate_query>{{ clickhouse_dicts[dict].clickhouse_source.invalidate_query }}</invalidate_query>
+                {% endif %}
+            </clickhouse>
+        {% elif clickhouse_dicts[dict].mongodb_source.db is defined %}
+            <mongodb>
+                <host>{{ clickhouse_dicts[dict].mongodb_source.host|default(localhost) }}</host>
+                <port>{{ clickhouse_dicts[dict].mongodb_source.port|default(27017) }}</port>
+                <user>{{ clickhouse_dicts[dict].mongodb_source.user }}</user>
+                <password>{{ clickhouse_dicts[dict].mongodb_source.password }}</password>
+                <db>{{ clickhouse_dicts[dict].mongodb_source.db }}</db>
+                <collection>{{ clickhouse_dicts[dict].mongodb_source.collection }}</collection>
+            </mongodb>
+        {% endif %}
+        </source>
+        <lifetime>
+            <min>{{ clickhouse_dicts[dict].lifetime.min|default(300)}}</min>
+            <max>{{ clickhouse_dicts[dict].lifetime.max|default(600)}}</max>
+        </lifetime>
+        <layout>
+            <{{ clickhouse_dicts[dict].layout|default("hashed") }}/>
+        </layout>
+        <structure>
+            {% if clickhouse_dicts[dict].structure.key.attributes is defined %}
+            <key>
+                {% for attribute in clickhouse_dicts[dict].structure.key.attributes %}
+                <attribute>
+                    <name>{{ attribute.name }}</name>
+                    <type>{{ attribute.type }}</type>
+                </attribute>
+                {% endfor %}
+            </key>
+            {% else %}
+            <id>
+                <name>{{ clickhouse_dicts[dict].structure.key }}</name>
+            </id>
+            {% endif %}
+            {% for attribute in clickhouse_dicts[dict].structure.attributes %}
+            <attribute>
+                <name>{{ attribute.name }}</name>
+                <type>{{ attribute.type }}</type>
+                <null_value>{{ attribute.null_value }}</null_value>
+            </attribute>
+            {% endfor %}
+        </structure>
+    </dictionary>
+    {% endfor %}
+</yandex>

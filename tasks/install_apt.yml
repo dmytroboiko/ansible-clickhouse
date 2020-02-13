@@ -25,9 +25,11 @@
 
 - name: Install by APT | Package installation
   apt:
-    name: "{{ item }}={{ clickhouse_version }}"
+    name: "{{ package }}={{ clickhouse_version }}"
     state: present
     force: yes
   with_items: "{{ clickhouse_package }}"
+  loop_control:
+    loop_var: package
   become: true
   tags: [install]

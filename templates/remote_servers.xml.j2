@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!-- {{ ansible_managed }} -->
 <yandex>
-  <remote_servers>
+  <remote_servers{% if clickhouse_remote_servers_zookeeper_key is defined %} replace="replace" from_zk="{{ clickhouse_remote_servers_zookeeper_key }}"{% endif %}>
 {% for cluster_name, shards in clickhouse_clusters.iteritems() %}
     <{{ cluster_name }}>
 {% for shard in shards %}
