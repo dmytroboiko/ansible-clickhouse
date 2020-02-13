@@ -2,18 +2,25 @@
 <!-- {{ ansible_managed }} -->
 <yandex>
   <remote_servers>
-{% for shard_name, replicas in clickhouse_shards.iteritems() %}
-    <{{ shard_name }}>
+{% for cluster_name, shards in clickhouse_clusters.iteritems() %}
+    <{{ cluster_name }}>
+{% for shard in shards %}
       <shard>
-        <internal_replication>true</internal_replication>
-{% for replica in replicas %}
+{% if shard.weight is defined %}
+        <weight>{{ shard.weight }}</weight>
+{% endif %}
+{% if shard.internal_replication is defined %}
+        <internal_replication>{{ shard.internal_replication }}</internal_replication>
+{% endif %}
+{% for replica in shard.servers %}
         <replica>
           <host>{{ replica['host'] }}</host>
           <port>{{ replica['port'] | default(9000) }}</port>
         </replica>
 {% endfor %}
       </shard>
-    </{{ shard_name }}>
+{% endfor %}
+    </{{ cluster_name }}>
 {% endfor %}
   </remote_servers>
 </yandex>

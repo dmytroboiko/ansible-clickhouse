@@ -1,4 +1,4 @@
-ansible-clickhouse [![Build Status](https://travis-ci.org/AlexeySetevoi/ansible-clickhouse.svg?branch=master)](https://travis-ci.org/AlexeySetevoi/ansible-clickhouse)
+ansible-clickhouse [![Build Status](https://travis-ci.com/dmytroboiko/ansible-clickhouse.svg?branch=master)](https://travis-ci.com/dmytroboiko/ansible-clickhouse)
 =========
 
 Simple clickhouse-server deploy and management role.
@@ -211,9 +211,12 @@ Including an example of how to use your role (for instance, with variables passe
                 - { name: testAttrName, type: UInt32, null_value: 0 }
           test2:
             name: test_dict
-            odbc_source:
-              connection_string: "DSN=testdb"
-              source_table: "dict_source"
+            mysql_source:
+              host: "localhost"
+              user: "clickhouse"
+              password: ""
+              db: "management"
+              table: "customers"
             lifetime:
               min: 300
               max: 360
@@ -228,11 +231,18 @@ Including an example of how to use your role (for instance, with variables passe
          - { name: testu1 }
          - { name: testu2, state:present }
          - { name: testu3, state:absent }
-      clickhouse_shards:
-        your_shard_name:
-          - { host: "db_host_1", port: 9000 }
-          - { host: "db_host_2", port: 9000 }
-          - { host: "db_host_3", port: 9000 }
+      clickhouse_clusters:
+        your_cluster_name:
+          - weight: 1
+            internal_replication: false
+            servers:
+              - { host: "db_host_1", port: 9000 }
+              - { host: "db_host_2", port: 9000 }
+          - weight: 1
+            internal_replication: false
+            servers:
+              - { host: "db_host_3", port: 9000 }
+              - { host: "db_host_4", port: 9000 }
       clickhouse_zookeeper_nodes:
         - { host: "zoo_host_1", port: 2181 }
         - { host: "zoo_host_2", port: 2181 }
